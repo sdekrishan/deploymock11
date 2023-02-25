@@ -68,8 +68,19 @@ userRouter.get("/getProfile",async(req,res)=>{
 userRouter.patch("/getProfile",async(req,res)=>{
     const id = req.body.userID;
     try {
-        const user = await UserModel.findByIdAndUpdate({_id:id},req.body);
-        res.status(200).send({user:user,message:'user has been successfully updated'})
+        bcrypt.hash(req.body.password,8,async(err,protected)=>{
+            if(err){
+             console.log(err);
+             res.status(400).send("something went wrong")
+            }
+            else{
+                const user = await UserModel.findByIdAndUpdate({_id:id},{email:req.body.email,password:protected,profile:req.body.profile,bio:req.body.bio,name:req.body.name,phone:req.body.phone});
+                
+                res.status(200).send({user:user,message:'user has been successfully updated'})
+                
+            }
+        })
+        // const user = await UserModel.findByIdAndUpdate({_id:id},req.body);
     } catch (error) {
         res.status(400).send('something went wrong')
     }
